@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>國字快查 - 簡易查詢結果</title>
+  <script language="javascript" type="text/javascript">
+    function change_page_size(pgsz_o) {
+        var pglnk = document.getElementById("page-number");
+        var reslst = document.getElementById("result-list").getElementsByTagName("li");
+        pgsz_o = parseInt(pgsz_o.value);
+        pglnk.title = pglnk.title.replace(/\d+/, pgsz_o > 0 ? Math.ceil(reslst.length / pgsz_o) : 1);
+        set_display(reslst, 0, reslst.length, false);
+        jump2page(1);
+    }
+    function initialize(pg_i, pgsz_i) {
+        if (typeof pg_i == "undefined" || typeof pgsz_i == "undefined") return;
+        var pglnk = document.getElementById("page-number");
+        var pgsz = document.getElementById("page-size");
+        pgsz.selectedIndex = pgsz_i;
+        pgsz = parseInt(pgsz.options[pgsz_i].value);
+        var reslst = document.getElementById("result-list").getElementsByTagName("li");
+        pglnk.title = pglnk.title.replace(/\d+/, pgsz > 0 ? Math.ceil(reslst.length / pgsz) : 1);
+        set_display(reslst, 0, reslst.length, false);
+        jump2page(pg_i);
+    }
+    function jump2page(p) {
+        var pglnk = document.getElementById("page-number");
+        if (typeof p == "undefined") { // User input required.
+            p = prompt("要跳到第幾頁", pglnk.innerHTML);
+            if (!/^\d+$/.test(p)) return;
+            p = parseInt(p);
+        }
+        var pgsz = document.getElementById("page-size");
+        var reslst = document.getElementById("result-list").getElementsByTagName("li");
+        pgsz = parseInt(pgsz.options[pgsz.selectedIndex].value);
+        var pgn = pgsz > 0 ? Math.ceil(reslst.length / pgsz) : 1;
+        if (pgsz <= 0 || pgsz > reslst.length) pgsz = reslst.length;
+        if (p < 1 || p > pgn) {
+            alert("指定的頁數超出範圍！");
+            return;
+        }
+        document.getElementById("<-").disabled = (p == 1);
+        document.getElementById("->").disabled = (p == pgn);
+        set_display(reslst, (pglnk.innerHTML - 1) * pgsz, pglnk.innerHTML * pgsz, false);
+        pglnk.innerHTML = p;
+        set_display(reslst, (pglnk.innerHTML - 1) * pgsz, pglnk.innerHTML * pgsz, true);
+        pglnk.focus();
+    }
+    function set_display(list, begin, end, value) {
+        begin = Math.max(begin, 0);
+        end = Math.min(end, list.length);
+        for (var i = begin; i < end; i++) list.item(i).style.display = value ? "list-item" : "none";
+    }
+  </script>
+ </head>
+ <body>
+  <div id="navigation" role="navigation" style="text-align: center">
+   <br/>
+   <table border="0">
+    <tr>
+     <td colspan="3">
+      <label>每頁顯示
+       <select id="page-size" onchange="change_page_size(this.options[this.selectedIndex]); this.focus();" title="頁碼">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="0" selected>全部顯示</option>
+       </select>
+      筆資料</label>
+     </td>
+    </tr>
+    <tr>
+     <td><input type="button" id="<-" value="上一頁" accesskey="P" onclick="jump2page(parseInt(document.getElementById('page-number').innerHTML)-1);" disabled/></td>
+     <td>第 <a href="javascript:void(0);" id="page-number" title="選擇頁數，共 1 頁" onclick="jump2page();"/>1</a> 頁</td>
+     <td><input type="button" id="->" value="下一頁" accesskey="N" onclick="jump2page(parseInt(document.getElementById('page-number').innerHTML)+1);" disabled/></td>
+    </tr>
+   </table>
+  </div>
+  <hr/>
+  <div role="main" id="main">
+   <br/>
+   <ol id="result-list" style="list-style-type: none">
+    <li><a href="javascript:void(0);">抱歉，尚未抓到任何資料！</a></li>
+   </ol>
+  </div>
+  <hr/>
+  <div role="contentinfo" id="contentinfo">
+   <br/>
+   <a href="javascript:void(0);" style="text-align: center" onclick="document.getElementById('page-number').focus();">&uarr; 回到頁首</a><br/>
+   若有任何問題請連繫 <a href="https://groups.io/g/nvda-tw" target="_blank" title="問題回報">NVDA 台灣郵遞論壇</a>，謝謝您寶貴的回饋與意見。
+  </div>
+ </body>
+</html>
